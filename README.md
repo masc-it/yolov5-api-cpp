@@ -31,3 +31,20 @@ Or, just build it from source.
     cmake --configure .
     cmake --build . --target main -j <num jobs>
 
+# Endpoints
+
+## /predict [POST]
+
+### Body
+- Image bytes (binary in Postman)
+
+### Headers
+- X-Confidence-Thresh
+  - default 0.5
+- X-NMS-Thresh
+  - default 0.45
+- X-Return
+  - image_with_boxes
+    - A JPEG image with drawn predictions
+  - json (default)
+    - A json array containing predictions. Each object defines: xmin, ymin, xmax, ymax, conf, class_name
