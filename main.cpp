@@ -52,13 +52,13 @@ int main(int argc, char *argv[])
                 auto conf_thresh_str = request.get_header_value("X-Confidence-Thresh");
 
                 if (conf_thresh_str.empty()){
-                    throw std::exception("X-Confidence-Thresh undefined");
+                    throw std::runtime_error("X-Confidence-Thresh undefined");
                 }
 
                 auto nms_thresh_str = request.get_header_value("X-NMS-Thresh");
 
                 if (nms_thresh_str.empty()){
-                    throw std::exception("X-NMS-Thresh undefined");
+                    throw std::runtime_error("X-NMS-Thresh undefined");
                 }
 
                 auto conf_thresh = std::stof(conf_thresh_str);
