@@ -47,11 +47,37 @@ int main(int argc, char *argv[])
 
             try {
                 std::string img_str = request.body;
+
+                // Check headers and sanitize
+                auto conf_thresh_str = request.get_header_value("X-Confidence-Thresh");
+
+                if (conf_thresh_str.empty()){
+                    throw std::exception("X-Confidence-Thresh undefined");
+                }
+
+                auto nms_thresh_str = request.get_header_value("X-NMS-Thresh");
+
+                if (nms_thresh_str.empty()){
+                    throw std::exception("X-NMS-Thresh undefined");
+                }
+
+                auto conf_thresh = std::stof(conf_thresh_str);
+                auto nms_thresh = std::stof(nms_thresh_str);
+
+                if (conf_thresh <= 0 || conf_thresh > 1){
+                    conf_thresh = 0.5;
+                }
+
+                if (nms_thresh <= 0 || nms_thresh > 1){
+                    nms_thresh = 0.5;
+                }
+
                 std::vector<uchar> data(img_str.begin(), img_str.end());
                 cv::Mat img = cv::imdecode(data, cv::IMREAD_UNCHANGED);
 
-                auto detection = model.detect(img, 0.5, 0.45);
+                auto detection = model.detect(img, conf_thresh, nms_thresh);
 
+                // TODO Return image or JSON
                 std::vector<uchar> buf;
                 cv::imencode(".jpg",detection.img_with_bboxes,buf);
                 std::string img_out(buf.begin(), buf.end());
@@ -61,7 +87,13 @@ int main(int argc, char *argv[])
                 res.add_header("Content-Type", "image/jpeg");
                 res.end();
             } catch(std::exception &e){
-                res.write(R"({"status": "ERR"})");
+                std::ostringstream stringStream;
+                stringStream << R"({"status": "ERR", "msg": ")";
+                stringStream << e.what();
+                stringStream << "\"}";
+                std::string msg = stringStream.str();
+
+                res.write(msg); // R"({"status": "ERR", "msg": e.what()})"
                 res.add_header("Content-Type", "application/json");
                 res.end();
             }
