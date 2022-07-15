@@ -14,7 +14,7 @@ using json = nlohmann::json;
 Model load_from_config(){
 
     std::ifstream inFile;
-    inFile.open("config.json");
+    inFile.open("data/config.json");
 
     std::stringstream strStream;
     strStream << inFile.rdbuf(); //read the file

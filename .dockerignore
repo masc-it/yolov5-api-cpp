@@ -1,0 +1,6 @@
+Dockerfile
+cmake-build-*/
+assets/
+.idea/
+*.json
+*.txt
