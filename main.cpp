@@ -1,17 +1,15 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <iostream>
+
 #include <string>
 #include <vector>
-#include <fstream>
+
 #include "model.h"
 #include "json.hpp"
 #include "crow_all.h"
 
 using json = nlohmann::json;
 
-
-/* main */
 
 Model load_from_config(){
 
@@ -34,19 +32,17 @@ Model load_from_config(){
 int main(int argc, char *argv[])
 {
 
-    // TODO load model, classes
     Model model = load_from_config();
 
     crow::SimpleApp app;
     CROW_ROUTE(app, "/test").methods("GET"_method)
             ([&model](const crow::request& request, crow::response& res) {
 
-            res.write("We");
+            res.write("Hello!");
             res.end();
             });
     CROW_ROUTE(app, "/").methods("POST"_method)
         ([&model](const crow::request& request, crow::response& res) {
-            //replace cat.jpg with your file path
 
             try {
                 std::string img_str = request.body;
@@ -63,8 +59,8 @@ int main(int argc, char *argv[])
                 std::string img_out(buf.begin(), buf.end());
 
                 res.write(img_out);
-                res.add_header("Access-Control-Allow-Origin", "*");
-                res.add_header("Access-Control-Allow-Headers", "Content-Type");
+                /*res.add_header("Access-Control-Allow-Origin", "*");
+                res.add_header("Access-Control-Allow-Headers", "Content-Type");*/
                 res.add_header("Content-Type", "image/jpeg");
                 res.end();
             } catch(std::exception &e){
